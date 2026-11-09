@@ -1,58 +1,101 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Serba Jaya Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel backend API and admin panel for the Serba Jaya ecommerce app.
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.3+ / Laravel 13
+- Session auth for admins (`admin` guard)
+- Sanctum ready for app users / buyers (`web` + API)
+- Blade admin UI with Iconify icons
+- Tailwind CSS 4 via Vite (optional for admin; panel styles also ship in `public/css/admin.css`)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Features so far
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- First-time setup when no admin exists (`/admin/setup`)
+- Admin login / logout (`/admin/login`)
+- Separate `admins` and `users` auth models/guards
+- Admin CRUD (`/admin/admins`)
+- Mobile-friendly admin shell with offcanvas sidebar
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP 8.3+
+- Composer
+- MySQL / MariaDB (or SQLite for local/testing)
+- Node.js + npm only if you want Vite/Tailwind asset builds
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Admin panel styles live in `public/css/admin.css` and work without `npm`.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Setup
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Configure your database in `.env`, then run migrations:
 
-## Contributing
+```bash
+php artisan migrate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Start the app:
 
-## Code of Conduct
+```bash
+php artisan serve
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Optional frontend tooling:
 
-## Security Vulnerabilities
+```bash
+npm install
+npm run dev
+# or
+npm run build
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Admin access
+
+1. Open `/admin`
+2. If no admin exists, create the first account at `/admin/setup`
+3. Otherwise sign in at `/admin/login`
+
+Useful routes:
+
+| Path | Description |
+|------|-------------|
+| `/admin/setup` | First admin setup |
+| `/admin/login` | Admin login |
+| `/admin` | Dashboard |
+| `/admin/admins` | Manage admins |
+
+## Auth guards
+
+| Guard | Model | Purpose |
+|-------|-------|---------|
+| `admin` | `App\Models\Admin` | Admin panel |
+| `web` | `App\Models\User` | App buyers / customers |
+
+## Flash messages
+
+From controllers:
+
+```php
+return redirect()->route('admin.admins.index')
+    ->with('success', 'Saved.');
+```
+
+Supported flash keys: `success`, `error`, `warning`, `info`  
+(`status` is treated as success for compatibility)
+
+## Tests
+
+```bash
+php artisan test
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Proprietary / project-specific unless otherwise noted.
