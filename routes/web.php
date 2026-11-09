@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SetupController;
@@ -25,5 +26,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['admin.access:authenticated', 'auth:admin'])->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
+
+        Route::resource('admins', AdminController::class)->except(['show']);
     });
 });

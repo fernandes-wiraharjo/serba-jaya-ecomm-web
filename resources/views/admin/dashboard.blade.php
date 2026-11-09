@@ -8,10 +8,12 @@
 @endsection
 
 @section('content')
-    <div class="card border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 class="text-2xl font-semibold tracking-tight text-slate-900">Welcome, {{ auth('admin')->user()->name }}</h2>
-        <p class="mt-2 text-sm leading-6 text-slate-500">
-            Your admin account is ready. Product, order, and catalog modules can be added next.
-        </p>
+    <div class="admin-panel">
+        <div class="admin-panel-body">
+            <h2 style="margin: 0 0 0.5rem; font-size: 1.35rem;">Welcome, {{ auth('admin')->user()->name }}</h2>
+            <p style="margin: 0; color: var(--admin-muted); font-size: 0.9rem; line-height: 1.6;">
+                Your admin account is ready. Product, order, and catalog modules can be added next.
+            </p>
+        </div>
     </div>
 @endsection
