@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\HandleAdminAccess;
+use App\Http\Middleware\VerifyApiSignature;
 use App\Http\Responses\ApiResponse;
 use App\Models\Admin;
 use Illuminate\Foundation\Application;
@@ -21,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.access' => HandleAdminAccess::class,
         ]);
+
+        $middleware->appendToGroup('api', VerifyApiSignature::class);
 
         $middleware->redirectGuestsTo(function () {
             return Admin::query()->exists()

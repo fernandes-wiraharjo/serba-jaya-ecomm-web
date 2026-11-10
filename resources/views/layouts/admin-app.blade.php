@@ -79,6 +79,18 @@
                         <x-icon name="lucide:shield-user" />
                         <span>Admins</span>
                     </a>
+
+                    <a
+                        href="{{ route('admin.api-clients.index') }}"
+                        @click="sidebarOpen = false"
+                        @class([
+                            'admin-nav-link',
+                            'is-active' => request()->routeIs('admin.api-clients.*'),
+                        ])
+                    >
+                        <x-icon name="lucide:key-round" />
+                        <span>API clients</span>
+                    </a>
                 </nav>
 
                 <div class="admin-sidebar-footer">

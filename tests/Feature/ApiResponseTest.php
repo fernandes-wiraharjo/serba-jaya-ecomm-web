@@ -25,7 +25,7 @@ class ApiResponseTest extends TestCase
 
     public function test_unauthenticated_api_user_returns_401_in_the_standard_envelope(): void
     {
-        $this->getJson(route('api.user'))
+        $this->signedApi('GET', route('api.user'))
             ->assertUnauthorized()
             ->assertExactJson([
                 'success' => false,
@@ -44,7 +44,7 @@ class ApiResponseTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $response = $this->getJson(route('api.user'));
+        $response = $this->signedApi('GET', route('api.user'));
 
         $response->assertOk();
         $response->assertJsonPath('success', true);

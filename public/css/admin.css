@@ -291,6 +291,22 @@ input {
     color: #7a5a10;
 }
 
+.admin-alert-secret {
+    align-items: flex-start;
+    border-width: 2px;
+    border-color: #d97706;
+    background: #fff4cc;
+    color: #7a3e00;
+    font-size: 0.98rem;
+    font-weight: 650;
+    line-height: 1.45;
+}
+
+.admin-alert-secret svg {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+}
+
 .admin-alert-info {
     border-color: #bfdbfe;
     background: #eff6ff;
