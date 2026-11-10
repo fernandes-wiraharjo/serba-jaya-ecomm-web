@@ -4,7 +4,7 @@
 @section('heading', 'Add API client')
 
 @section('heading-icon')
-    <x-icon name="lucide:key-round" width="1.35rem" height="1.35rem" />
+    <x-icon name="lucide:key-round" width="1.05rem" height="1.05rem" />
 @endsection
 
 @section('content')
@@ -12,8 +12,6 @@
         <x-icon name="lucide:arrow-left" width="1rem" height="1rem" />
         <span>Back to API clients</span>
     </a>
-
-    @include('admin.api-clients._secret-warning')
 
     <div class="admin-panel admin-form">
         <div class="admin-panel-body">

@@ -6,6 +6,8 @@ use App\Models\Admin;
 use App\Models\ApiClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ApiClientManagementTest extends TestCase
@@ -20,7 +22,7 @@ class ApiClientManagementTest extends TestCase
             ->assertRedirect(route('admin.login'));
     }
 
-    public function test_admin_can_create_an_api_client_and_see_the_secret_once(): void
+    public function test_admin_can_create_an_api_client_and_keep_seeing_the_secret(): void
     {
         $admin = Admin::factory()->create();
 
@@ -32,28 +34,42 @@ class ApiClientManagementTest extends TestCase
             ]);
 
         $response->assertRedirect(route('admin.api-clients.index'));
-        $response->assertSessionHas('api_client_credentials');
+        $response->assertSessionMissing('api_client_credentials');
 
-        /** @var array{client_id: string, secret: string} $credentials */
-        $credentials = session('api_client_credentials');
-
-        $this->assertMatchesRegularExpression('/^client_\d{5}$/', $credentials['client_id']);
-        $this->assertStringStartsWith('sk_dev_', $credentials['secret']);
-        $this->assertNotSame('client_hacked', $credentials['client_id']);
-        $this->assertNotSame('sk_dev_hacked', $credentials['secret']);
-
-        $this->assertDatabaseHas('api_clients', [
-            'name' => 'Mobile app',
-            'client_id' => $credentials['client_id'],
-        ]);
-        $this->assertDatabaseMissing('api_clients', [
-            'secret' => $credentials['secret'],
-        ]);
-
-        $stored = ApiClient::query()->where('client_id', $credentials['client_id'])->first();
+        $stored = ApiClient::query()->where('name', 'Mobile app')->first();
 
         $this->assertNotNull($stored);
-        $this->assertSame($credentials['secret'], $stored->secret);
+        $this->assertMatchesRegularExpression('/^client_\d{5}$/', $stored->client_id);
+        $this->assertStringStartsWith('sk_dev_', $stored->secret);
+        $this->assertNotSame('client_hacked', $stored->client_id);
+        $this->assertNotSame('sk_dev_hacked', $stored->secret);
+        $this->assertDatabaseHas('api_clients', [
+            'name' => 'Mobile app',
+            'client_id' => $stored->client_id,
+            'secret' => $stored->secret,
+        ]);
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.api-clients.index'))
+            ->assertOk()
+            ->assertSee($stored->secret)
+            ->assertDontSee('It will not be shown again.');
+    }
+
+    public function test_legacy_encrypted_secret_is_still_readable(): void
+    {
+        $secret = 'sk_dev_legacysecretlegacysecretlegacysecret12';
+        $apiClient = ApiClient::factory()->create([
+            'secret' => $secret,
+        ]);
+
+        DB::table('api_clients')->where('id', $apiClient->id)->update([
+            'secret' => Crypt::encryptString($secret),
+        ]);
+
+        $apiClient->refresh();
+
+        $this->assertSame($secret, $apiClient->secret);
     }
 
     public function test_production_secret_uses_the_prod_prefix(): void
@@ -66,12 +82,12 @@ class ApiClientManagementTest extends TestCase
             ->post(route('admin.api-clients.store'), [
                 'name' => 'Production app',
             ])
-            ->assertSessionHas('api_client_credentials');
+            ->assertSessionMissing('api_client_credentials');
 
-        /** @var array{secret: string} $credentials */
-        $credentials = session('api_client_credentials');
+        $stored = ApiClient::query()->where('name', 'Production app')->first();
 
-        $this->assertStringStartsWith('sk_prod_', $credentials['secret']);
+        $this->assertNotNull($stored);
+        $this->assertStringStartsWith('sk_prod_', $stored->secret);
     }
 
     public function test_create_api_client_requires_a_name(): void
@@ -115,15 +131,16 @@ class ApiClientManagementTest extends TestCase
             ->post(route('admin.api-clients.regenerate', $apiClient));
 
         $response->assertRedirect(route('admin.api-clients.index'));
-
-        /** @var array{secret: string} $credentials */
-        $credentials = session('api_client_credentials');
+        $response->assertSessionMissing('api_client_credentials');
 
         $apiClient->refresh();
 
-        $this->assertNotSame($originalSecret, $credentials['secret']);
-        $this->assertSame($credentials['secret'], $apiClient->secret);
-        $this->assertStringStartsWith('sk_dev_', $credentials['secret']);
+        $this->assertNotSame($originalSecret, $apiClient->secret);
+        $this->assertStringStartsWith('sk_dev_', $apiClient->secret);
+        $this->assertDatabaseHas('api_clients', [
+            'id' => $apiClient->id,
+            'secret' => $apiClient->secret,
+        ]);
     }
 
     public function test_regenerating_a_secret_drops_the_cached_secret(): void
@@ -142,7 +159,7 @@ class ApiClientManagementTest extends TestCase
             ->post(route('admin.api-clients.regenerate', $apiClient))
             ->assertRedirect(route('admin.api-clients.index'));
 
-        $this->assertFalse(Cache::has('api-client-secret:'.$apiClient->client_id));
+        $this->assertFalse(Cache::has('api-client-plain-secret:'.$apiClient->client_id));
 
         $this->getJson(route('api.server-time'), [
             'X-Client-ID' => $apiClient->client_id,
@@ -168,7 +185,7 @@ class ApiClientManagementTest extends TestCase
             ->delete(route('admin.api-clients.destroy', $apiClient))
             ->assertRedirect(route('admin.api-clients.index'));
 
-        $this->assertFalse(Cache::has('api-client-secret:'.$apiClient->client_id));
+        $this->assertFalse(Cache::has('api-client-plain-secret:'.$apiClient->client_id));
 
         $this->getJson(route('api.server-time'), [
             'X-Client-ID' => $apiClient->client_id,
@@ -190,26 +207,27 @@ class ApiClientManagementTest extends TestCase
         $this->assertModelMissing($apiClient);
     }
 
-    public function test_api_client_screens_warn_that_the_secret_is_never_sent(): void
+    public function test_api_client_screens_leave_signature_instructions_to_the_docs(): void
     {
         $admin = Admin::factory()->create();
         $apiClient = ApiClient::factory()->create();
-        $warning = 'Store the secret securely and never send it with a request.';
+        $wording = 'Store the secret securely and never send it with a request.';
 
         $this->actingAs($admin, 'admin')
             ->get(route('admin.api-clients.index'))
             ->assertOk()
-            ->assertSee($warning);
+            ->assertDontSee($wording)
+            ->assertDontSee('Every API request sends');
 
         $this->actingAs($admin, 'admin')
             ->get(route('admin.api-clients.create'))
             ->assertOk()
-            ->assertSee($warning);
+            ->assertDontSee($wording);
 
         $this->actingAs($admin, 'admin')
             ->get(route('admin.api-clients.edit', $apiClient))
             ->assertOk()
-            ->assertSee($warning);
+            ->assertDontSee($wording);
     }
 
     public function test_api_client_name_is_escaped(): void

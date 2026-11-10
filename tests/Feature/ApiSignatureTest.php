@@ -169,10 +169,9 @@ class ApiSignatureTest extends TestCase
         $this->getJson(route('api.server-time'), $this->signatureHeaders($clientId, $secret, 'first'))
             ->assertOk();
 
-        $cached = Cache::get('api-client-secret:'.$clientId);
+        $cached = Cache::get('api-client-plain-secret:'.$clientId);
 
-        $this->assertIsString($cached);
-        $this->assertStringNotContainsString($secret, $cached);
+        $this->assertSame($secret, $cached);
 
         DB::table('api_clients')->where('client_id', $clientId)->delete();
 

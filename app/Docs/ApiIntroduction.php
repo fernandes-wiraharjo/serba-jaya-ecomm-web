@@ -20,7 +20,7 @@ class ApiIntroduction
         | `X-Nonce` | yes | A random string, unique on each request to the same endpoint. |
         | `X-Api-Signature` | yes | Lowercase hex SHA-256 of the string described below. |
 
-        Create the client under **Admin → API clients**. The secret key is shown once, when the client is created or regenerated. Outside production it starts with `sk_dev_`. In production it starts with `sk_prod_`.
+        Create the client under **Admin → API clients**. The secret key stays visible there. Outside production it starts with `sk_dev_`. In production it starts with `sk_prod_`.
 
         <div style="margin:0 0 1.25rem;padding:0.95rem 1rem;border:2px solid #d97706;border-radius:8px;background:#fff4cc;color:#7a3e00;line-height:1.5;"><b>Store the secret key securely and never send it with a request.</b> Only the client id is exposed, in the X-Client-ID header. The secret key stays on client's secure storage and is used only to build X-Api-Signature.</div>
 

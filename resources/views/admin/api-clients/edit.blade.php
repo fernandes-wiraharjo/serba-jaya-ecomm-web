@@ -4,7 +4,7 @@
 @section('heading', 'Edit API client')
 
 @section('heading-icon')
-    <x-icon name="lucide:key-round" width="1.35rem" height="1.35rem" />
+    <x-icon name="lucide:key-round" width="1.05rem" height="1.05rem" />
 @endsection
 
 @section('content')
@@ -13,13 +13,16 @@
         <span>Back to API clients</span>
     </a>
 
-    @include('admin.api-clients._secret-warning')
-
     <div class="admin-panel admin-form">
         <div class="admin-panel-body">
             <div class="admin-field">
                 <label>Client ID</label>
-                <p><code style="word-break: break-all;">{{ $apiClient->client_id }}</code></p>
+                <p><code class="admin-break">{{ $apiClient->client_id }}</code></p>
+            </div>
+
+            <div class="admin-field">
+                <label>Secret</label>
+                <p><code class="admin-break">{{ $apiClient->secret }}</code></p>
             </div>
 
             <form method="POST" action="{{ route('admin.api-clients.update', $apiClient) }}">

@@ -6,6 +6,7 @@ use Database\Factories\ApiClientFactory;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -20,13 +21,26 @@ class ApiClient extends Model
     use HasFactory;
 
     /**
-     * @return array<string, string>
+     * Read a legacy encrypted secret until the plaintext migration has run.
+     *
+     * @return Attribute<string, string>
      */
-    protected function casts(): array
+    protected function secret(): Attribute
     {
-        return [
-            'secret' => 'encrypted',
-        ];
+        return Attribute::make(
+            get: function (mixed $value): string {
+                if (! is_string($value) || $value === '') {
+                    return '';
+                }
+
+                try {
+                    return Crypt::decryptString($value);
+                } catch (DecryptException) {
+                    return $value;
+                }
+            },
+            set: fn (string $value): string => $value,
+        );
     }
 
     public static function newClientId(): string
@@ -46,34 +60,24 @@ class ApiClient extends Model
     }
 
     /**
-     * Resolve the plaintext secret, using the encrypted value cached for one hour.
+     * Resolve the secret, using the value cached for one hour.
      */
     public static function cachedSecret(string $clientId): ?string
     {
         $cacheKey = static::secretCacheKey($clientId);
-        $encrypted = Cache::get($cacheKey);
+        $cached = Cache::get($cacheKey);
 
-        if (is_string($encrypted)) {
-            try {
-                return Crypt::decryptString($encrypted);
-            } catch (DecryptException) {
-                Cache::forget($cacheKey);
-            }
+        if (is_string($cached) && $cached !== '') {
+            return $cached;
         }
 
         $client = static::query()->where('client_id', $clientId)->first();
 
-        if ($client === null) {
+        if ($client === null || $client->secret === '') {
             return null;
         }
 
-        $encrypted = $client->getRawOriginal('secret');
-
-        if (! is_string($encrypted) || $encrypted === '') {
-            return null;
-        }
-
-        Cache::put($cacheKey, $encrypted, now()->addHour());
+        Cache::put($cacheKey, $client->secret, now()->addHour());
 
         return $client->secret;
     }
@@ -98,6 +102,6 @@ class ApiClient extends Model
 
     private static function secretCacheKey(string $clientId): string
     {
-        return 'api-client-secret:'.$clientId;
+        return 'api-client-plain-secret:'.$clientId;
     }
 }

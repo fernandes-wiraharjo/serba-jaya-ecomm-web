@@ -64,7 +64,7 @@
                             'is-active' => request()->routeIs('admin.dashboard'),
                         ])
                     >
-                        <x-icon name="lucide:layout-dashboard" />
+                        <x-icon name="lucide:layout-dashboard" width="1rem" height="1rem" />
                         <span>Dashboard</span>
                     </a>
 
@@ -76,7 +76,7 @@
                             'is-active' => request()->routeIs('admin.admins.*'),
                         ])
                     >
-                        <x-icon name="lucide:shield-user" />
+                        <x-icon name="lucide:shield-user" width="1rem" height="1rem" />
                         <span>Admins</span>
                     </a>
 
@@ -88,7 +88,7 @@
                             'is-active' => request()->routeIs('admin.api-clients.*'),
                         ])
                     >
-                        <x-icon name="lucide:key-round" />
+                        <x-icon name="lucide:key-round" width="1rem" height="1rem" />
                         <span>API clients</span>
                     </a>
                 </nav>

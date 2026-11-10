@@ -52,11 +52,7 @@ class ApiClientController extends Controller
 
         return redirect()
             ->route('admin.api-clients.index')
-            ->with('success', 'API client created. Copy the secret now. It will not be shown again.')
-            ->with('api_client_credentials', [
-                'client_id' => $apiClient->client_id,
-                'secret' => $secret,
-            ]);
+            ->with('success', 'API client created.');
     }
 
     /**
@@ -100,11 +96,7 @@ class ApiClientController extends Controller
 
         return redirect()
             ->route('admin.api-clients.index')
-            ->with('success', 'Secret regenerated. Copy it now. It will not be shown again.')
-            ->with('api_client_credentials', [
-                'client_id' => $apiClient->client_id,
-                'secret' => $secret,
-            ]);
+            ->with('success', 'Secret regenerated.');
     }
 
     /**
