@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ApiClientController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SetupController;
@@ -28,5 +29,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
 
         Route::resource('admins', AdminController::class)->except(['show']);
+
+        Route::post('api-clients/{api_client}/regenerate', [ApiClientController::class, 'regenerate'])
+            ->name('api-clients.regenerate');
+        Route::resource('api-clients', ApiClientController::class)->except(['show']);
     });
 });

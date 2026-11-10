@@ -4,7 +4,7 @@
 @section('heading', 'Add admin')
 
 @section('heading-icon')
-    <x-icon name="lucide:user-plus" width="1.35rem" height="1.35rem" />
+    <x-icon name="lucide:user-plus" width="1.05rem" height="1.05rem" />
 @endsection
 
 @section('content')

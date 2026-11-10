@@ -16,7 +16,7 @@
     --admin-warning-ink: #fff8e7;
     --admin-sidebar: #102a2a;
     --admin-sidebar-muted: #9bb5b3;
-    --admin-sidebar-width: 16rem;
+    --admin-sidebar-width: 13.25rem;
 }
 
 * {
@@ -93,15 +93,15 @@ input {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    padding: 1.15rem 1rem 1.15rem 1.15rem;
+    gap: 0.55rem;
+    padding: 0.7rem 0.7rem 0.7rem 0.8rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .admin-sidebar-brand-main {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.55rem;
     min-width: 0;
 }
 
@@ -109,8 +109,8 @@ input {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 1.75rem;
+    height: 1.75rem;
     flex-shrink: 0;
     background: rgba(94, 234, 212, 0.12);
     color: #5eead4;
@@ -125,8 +125,8 @@ input {
 }
 
 .admin-sidebar-brand-meta {
-    margin-top: 0.3rem;
-    font-size: 0.875rem;
+    margin-top: 0.1rem;
+    font-size: 0.75rem;
     color: var(--admin-sidebar-muted);
 }
 
@@ -153,8 +153,8 @@ input {
 .admin-sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-    padding: 1rem 0.75rem;
+    gap: 0.1rem;
+    padding: 0.45rem 0.45rem;
     flex: 1;
     overflow-y: auto;
 }
@@ -162,10 +162,10 @@ input {
 .admin-nav-link {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
-    padding: 0.75rem 0.85rem;
+    gap: 0.5rem;
+    padding: 0.4rem 0.55rem;
     color: #d7e7e5;
-    font-size: 0.925rem;
+    font-size: 0.8125rem;
     font-weight: 500;
 }
 
@@ -179,7 +179,7 @@ input {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    padding: 0.85rem 0.75rem;
+    padding: 0.6rem 0.55rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -238,8 +238,8 @@ input {
 .admin-page-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.9rem 1rem;
+    gap: 0.55rem;
+    padding: 0.55rem 0.85rem;
     background: var(--admin-surface);
     border-bottom: 1px solid var(--admin-line);
 }
@@ -247,7 +247,7 @@ input {
 .admin-page-header h1 {
     margin: 0;
     min-width: 0;
-    font-size: 1.15rem;
+    font-size: 1rem;
     font-weight: 600;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -260,7 +260,7 @@ input {
 }
 
 .admin-content {
-    padding: 1rem;
+    padding: 0.75rem;
 }
 
 .admin-alert {
@@ -300,8 +300,8 @@ input {
 .admin-toolbar {
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
-    margin-bottom: 1rem;
+    gap: 0.5rem;
+    margin-bottom: 0.65rem;
 }
 
 .admin-toolbar p {
@@ -316,23 +316,28 @@ input {
 }
 
 .admin-panel-body {
-    padding: 1.25rem;
+    padding: 0.85rem;
 }
 
 .admin-table-wrap {
     overflow-x: auto;
 }
 
+.admin-table code,
+.admin-break {
+    word-break: break-all;
+}
+
 .admin-table {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-    font-size: 0.9rem;
+    font-size: 0.8125rem;
 }
 
 .admin-table th,
 .admin-table td {
-    padding: 0.9rem 1rem;
+    padding: 0.45rem 0.7rem;
     border-bottom: 1px solid var(--admin-line);
     vertical-align: middle;
 }
@@ -348,7 +353,7 @@ input {
 }
 
 .admin-table-empty {
-    padding: 2rem 1rem;
+    padding: 1.1rem 0.7rem;
     text-align: center;
     color: var(--admin-muted);
 }
@@ -364,21 +369,27 @@ input {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
-    gap: 0.5rem;
+    gap: 0.35rem;
 }
 
 .admin-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.45rem;
+    gap: 0.35rem;
     border: 1px solid transparent;
-    padding: 0.65rem 0.95rem;
-    font-size: 0.875rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.8125rem;
+    line-height: 1.25;
     font-weight: 600;
     cursor: pointer;
     background: transparent;
     color: inherit;
+}
+
+.admin-actions .admin-btn {
+    padding: 0.28rem 0.45rem;
+    font-size: 0.75rem;
 }
 
 .admin-btn-primary {
@@ -442,13 +453,13 @@ input {
 }
 
 .admin-field {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 }
 
 .admin-field label {
     display: block;
-    margin-bottom: 0.4rem;
-    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.8125rem;
     font-weight: 500;
 }
 
@@ -457,16 +468,22 @@ input {
     color: var(--admin-muted);
 }
 
-.admin-field input {
+.admin-field input,
+.admin-field select,
+.admin-field textarea {
     width: 100%;
     border: 1px solid var(--admin-line);
     border-radius: 0;
-    padding: 0.75rem 0.85rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.8125rem;
+    line-height: 1.25;
     background: #fff;
     color: var(--admin-ink);
 }
 
-.admin-field input:focus {
+.admin-field input:focus,
+.admin-field select:focus,
+.admin-field textarea:focus {
     outline: 2px solid rgba(15, 118, 110, 0.2);
     border-color: var(--admin-accent);
 }
@@ -481,8 +498,8 @@ input {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.75rem;
-    margin-top: 1.25rem;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
 }
 
 .admin-cancel-link {
@@ -503,7 +520,11 @@ input {
     .admin-toolbar {
         flex-direction: row;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-end;
+    }
+
+    .admin-toolbar p {
+        margin-right: auto;
     }
 
     .admin-btn-block {
@@ -535,14 +556,14 @@ input {
     }
 
     .admin-page-header {
-        padding: 1.15rem 1.5rem;
+        padding: 0.65rem 1rem;
     }
 
     .admin-page-header h1 {
-        font-size: 1.35rem;
+        font-size: 1.05rem;
     }
 
     .admin-content {
-        padding: 1.5rem;
+        padding: 1rem;
     }
 }
