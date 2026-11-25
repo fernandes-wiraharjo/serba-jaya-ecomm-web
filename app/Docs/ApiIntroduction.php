@@ -107,6 +107,99 @@ class ApiIntroduction
         ```
 
         A missing header, an unknown client, a signature that does not match, or a signature that has already been used within the last hour returns `401` in the standard envelope (`success`, `message`, `data`, `errors`).
+
+        ## Sign in with Google or Apple
+
+        There are two sign-in options. The app can send an identity token from the Google or Apple SDK, or it can ask this API for a Google login URL and let the browser finish sign-in.
+
+        Signed requests still need `X-Client-ID`, `X-Nonce`, and `X-Api-Signature`. A JSON body is part of the signature payload. The Google browser callback is not signed, because Google redirects the browser there.
+
+        ### Google login URL
+
+        `GET /api/auth/google/url`
+
+        The response `data.url` is a Google authorization URL. Open it in the browser. Register `GOOGLE_REDIRECT_URI` (or `{APP_URL}/auth/google/callback` when that value is empty) as an authorized redirect URI on the Google OAuth client.
+
+        After Google signs the user in, this API redirects the browser to an Android intent link. Set `GOOGLE_MOBILE_INTENT_SCHEME` and `GOOGLE_MOBILE_INTENT_PACKAGE` to the app scheme and application id. The app opens on `{scheme}://callback`.
+
+        Success carries the Sanctum bearer token in `token`. Failure carries `error` instead, for example `invalid_state`, `access_denied`, or `sign_in_failed`.
+
+        ```text
+        intent://callback?token=1%7Cs3rbaJayaExampleToken#Intent;scheme=serbajaya;package=com.serbajaya.app;end
+        ```
+
+        The identity-token endpoints accept the token the provider already gave the app and return a Sanctum bearer token. They do not redirect.
+
+        ### Google
+
+        `POST /api/auth/google`
+
+        ```json
+        {
+          "identity_token": "the Google ID token from the mobile SDK",
+          "device_name": "iPhone 16"
+        }
+        ```
+
+        `device_name` is optional and defaults to `mobile`. It only labels the Sanctum token.
+
+        `GOOGLE_CLIENT_ID` must match the token audience. iOS, Android, and web each have their own client id. List any extra audiences in `GOOGLE_CLIENT_IDS`, separated by commas.
+
+        ### Apple
+
+        `POST /api/auth/apple`
+
+        ```json
+        {
+          "identity_token": "the Apple identity token from the mobile SDK",
+          "nonce": "the raw nonce the app created",
+          "device_name": "iPhone 16"
+        }
+        ```
+
+        Send the raw nonce. This API hashes it with SHA-256 and compares that digest to the nonce claim in the identity token. Do not hash it before sending.
+
+        `APPLE_CLIENT_ID` is the token audience, usually the iOS bundle id. List any extra audiences in `APPLE_AUDIENCES`, separated by commas.
+
+        The account is stored by the provider subject id. A later sign-in with the same Apple or Google account returns a token for the same user, even when the provider omits the email.
+
+        ### Response
+
+        `data.token` is the Sanctum bearer token. Send it as `Authorization: Bearer {token}` on later requests that require a signed-in user. Those requests still require the API signature headers.
+
+        ```json
+        {
+          "success": true,
+          "message": "Signed in.",
+          "data": {
+            "token": "1|s3rbaJayaExampleToken",
+            "user": {
+              "id": 1,
+              "name": "Buyer",
+              "email": "buyer@example.com"
+            }
+          },
+          "errors": null
+        }
+        ```
+
+        An identity token that fails verification is rejected:
+
+        ```http
+        HTTP/1.1 401 Unauthorized
+        Content-Type: application/json
+
+        {
+          "success": false,
+          "message": "The identity token is invalid.",
+          "data": null,
+          "errors": {
+            "identity_token": [
+              "The identity token is invalid."
+            ]
+          }
+        }
+        ```
         MD;
     }
 }

@@ -5,7 +5,12 @@ use App\Http\Controllers\Admin\ApiClientController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SetupController;
+use App\Http\Controllers\Api\SocialAuthController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/auth/google/callback', [SocialAuthController::class, 'googleCallback'])
+    ->middleware('throttle:10,1')
+    ->name('auth.google.callback');
 
 Route::get('/', function () {
     return redirect()->route('admin.dashboard');
