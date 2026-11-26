@@ -15,6 +15,8 @@ class ApiDocumentationTest extends TestCase
         $response->assertOk();
         $response->assertSee('Store the secret key securely and never send it with a request.', false);
         $response->assertSee('How to build the signature', false);
+        $response->assertSee('Uploaded files are excluded.', false);
+        $response->assertSee('Leave every file out of the signature.', false);
         $response->assertSee('X-Client-ID', false);
         $response->assertSee('X-Nonce', false);
         $response->assertSee('X-Api-Signature', false);
