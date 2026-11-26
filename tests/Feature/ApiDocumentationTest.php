@@ -30,5 +30,8 @@ class ApiDocumentationTest extends TestCase
         $response->assertSee('GOOGLE_MOBILE_INTENT_PACKAGE', false);
         $response->assertSee('The Google browser callback is not signed', false);
         $response->assertSee('SDK login does not use a client secret.', false);
+        $response->assertSee('Complete registration', false);
+        $response->assertSee('The profile photo is not part of the signature.', false);
+        $response->assertSee('returns `data.valid`', false);
     }
 }

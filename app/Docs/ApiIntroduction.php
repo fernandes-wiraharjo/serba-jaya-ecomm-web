@@ -169,6 +169,25 @@ class ApiIntroduction
         }
         ```
 
+        ## Complete registration
+
+        Google sign-in stores the name and email. `POST /api/auth/register` saves the rest for the signed-in user. Send the Sanctum bearer token and the API signature headers.
+
+        The profile photo is not part of the signature. Sign the text fields only.
+
+        | Field | Required | Value |
+        | --- | --- | --- |
+        | `name` | yes | Display name. |
+        | `phone` | yes | Indonesian mobile number. Spaces and dashes are removed. `0812...`, `+62...`, and a number with no prefix are stored as `628...`. |
+        | `birth_date` | no | `Y-m-d`. |
+        | `gender` | no | `male` or `female`. |
+        | `profile_photo` | no | Image file, resized to 600 by 600 WebP. The response URL is built from the stored disk and path. |
+        | `referral_code` | no | Another member's code. It is rejected when that code does not exist. |
+
+        `POST /api/user/referral/code-check` accepts `{ "code": "K7MQ2P9" }` and returns `data.valid`. Use it to enable the submit button. The signed-in user's own code is not valid.
+
+        The register response `referral_code` is this account's own code to share. `referral_code` in the request is the code they join with.
+
         An identity token that fails verification is rejected:
 
         ```http
