@@ -175,6 +175,7 @@ class SocialAuthTest extends TestCase
 
     public function test_apple_sign_in_hashes_the_raw_nonce_and_returns_a_sanctum_token(): void
     {
+        $this->markTestSkipped('Apple sign-in is disabled.');
         $driver = Mockery::mock();
         $driver->shouldReceive('userByIdentityToken')
             ->once()
@@ -197,6 +198,7 @@ class SocialAuthTest extends TestCase
 
     public function test_repeat_apple_sign_in_without_an_email_returns_the_same_user(): void
     {
+        $this->markTestSkipped('Apple sign-in is disabled.');
         $driver = Mockery::mock();
         $driver->shouldReceive('userByIdentityToken')->twice()->andReturn(
             $this->socialUser('apple-sub-1', 'Buyer', 'buyer@example.com', 'true'),
@@ -223,6 +225,7 @@ class SocialAuthTest extends TestCase
 
     public function test_apple_sign_in_returns_422_when_the_first_token_has_no_email(): void
     {
+        $this->markTestSkipped('Apple sign-in is disabled.');
         $this->mockDriver('apple', 'userByIdentityToken', 'apple-token', $this->socialUser(
             'apple-sub-1',
             null,
@@ -242,6 +245,7 @@ class SocialAuthTest extends TestCase
 
     public function test_apple_sign_in_returns_401_for_an_unverified_identity_token(): void
     {
+        $this->markTestSkipped('Apple sign-in is disabled.');
         $this->signedApi('POST', '/api/auth/apple', [
             'identity_token' => 'not-a-token',
             'nonce' => 'raw-nonce',
@@ -253,6 +257,7 @@ class SocialAuthTest extends TestCase
 
     public function test_apple_sign_in_returns_422_when_the_nonce_is_missing(): void
     {
+        $this->markTestSkipped('Apple sign-in is disabled.');
         $this->signedApi('POST', '/api/auth/apple', [
             'identity_token' => 'apple-token',
         ])->assertUnprocessable()

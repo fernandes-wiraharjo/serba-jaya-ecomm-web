@@ -29,6 +29,5 @@ class ApiDocumentationTest extends TestCase
         $response->assertSee('scheme=serbajaya;package=com.serbajaya.app', false);
         $response->assertSee('GOOGLE_MOBILE_INTENT_PACKAGE', false);
         $response->assertSee('The Google browser callback is not signed', false);
-        $response->assertSee('Send the raw nonce.', false);
     }
 }

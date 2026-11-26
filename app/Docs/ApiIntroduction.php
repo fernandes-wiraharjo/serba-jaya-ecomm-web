@@ -108,9 +108,9 @@ class ApiIntroduction
 
         A missing header, an unknown client, a signature that does not match, or a signature that has already been used within the last hour returns `401` in the standard envelope (`success`, `message`, `data`, `errors`).
 
-        ## Sign in with Google or Apple
+        ## Sign in with Google
 
-        There are two sign-in options. The app can send an identity token from the Google or Apple SDK, or it can ask this API for a Google login URL and let the browser finish sign-in.
+        There are two sign-in options. The app can send an identity token from the Google SDK, or it can ask this API for a Google login URL and let the browser finish sign-in.
 
         Signed requests still need `X-Client-ID`, `X-Nonce`, and `X-Api-Signature`. A JSON body is part of the signature payload. The Google browser callback is not signed, because Google redirects the browser there.
 
@@ -128,7 +128,7 @@ class ApiIntroduction
         intent://callback?token=1%7Cs3rbaJayaExampleToken#Intent;scheme=serbajaya;package=com.serbajaya.app;end
         ```
 
-        The identity-token endpoints accept the token the provider already gave the app and return a Sanctum bearer token. They do not redirect.
+        The identity-token endpoint accepts the token the provider already gave the app and returns a Sanctum bearer token. It does not redirect.
 
         ### Google
 
@@ -145,23 +145,7 @@ class ApiIntroduction
 
         `GOOGLE_CLIENT_ID` must match the token audience. iOS, Android, and web each have their own client id. List any extra audiences in `GOOGLE_CLIENT_IDS`, separated by commas.
 
-        ### Apple
-
-        `POST /api/auth/apple`
-
-        ```json
-        {
-          "identity_token": "the Apple identity token from the mobile SDK",
-          "nonce": "the raw nonce the app created",
-          "device_name": "iPhone 16"
-        }
-        ```
-
-        Send the raw nonce. This API hashes it with SHA-256 and compares that digest to the nonce claim in the identity token. Do not hash it before sending.
-
-        `APPLE_CLIENT_ID` is the token audience, usually the iOS bundle id. List any extra audiences in `APPLE_AUDIENCES`, separated by commas.
-
-        The account is stored by the provider subject id. A later sign-in with the same Apple or Google account returns a token for the same user, even when the provider omits the email.
+        The account is stored by the provider subject id. A later sign-in with the same Google account returns a token for the same user, even when the provider omits the email.
 
         ### Response
 
