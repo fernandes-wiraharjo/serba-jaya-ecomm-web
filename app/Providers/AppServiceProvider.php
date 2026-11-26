@@ -3,10 +3,15 @@
 namespace App\Providers;
 
 use App\Docs\ApiIntroduction;
+use App\Support\GoogleIdentityProvider;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Socialite\Facades\Socialite;
+use SocialiteProviders\Apple\Provider as AppleProvider;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,6 +41,17 @@ class AppServiceProvider extends ServiceProvider
 
         Scramble::configure()->withDocumentTransformers(function (OpenApi $openApi): void {
             $openApi->info->setDescription(ApiIntroduction::markdown());
+        });
+
+        Event::listen(function (SocialiteWasCalled $event): void {
+            $event->extendSocialite('apple', AppleProvider::class);
+        });
+
+        Socialite::extend('google', function ($app) {
+            return Socialite::buildProvider(
+                GoogleIdentityProvider::class,
+                $app['config']['services.google'],
+            );
         });
     }
 }

@@ -23,5 +23,12 @@ class ApiDocumentationTest extends TestCase
         $response->assertSee('The API signature has already been used.', false);
         $response->assertSee('api_signature', false);
         $response->assertSee('96c25359bf61c9c5745403c6da4bb1c2838f7d1d40dbadab865f274023378927', false);
+        $response->assertSee('Google login URL', false);
+        $response->assertSee('This endpoint is used when the frontend manages sign-in with the SDK.', false);
+        $response->assertSee('For web-based login, see', false);
+        $response->assertSee('scheme=serbajaya;package=com.serbajaya.app', false);
+        $response->assertSee('GOOGLE_MOBILE_INTENT_PACKAGE', false);
+        $response->assertSee('The Google browser callback is not signed', false);
+        $response->assertSee('SDK login does not use a client secret.', false);
     }
 }
