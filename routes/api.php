@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/server-time', [ServerTimeController::class, 'show'])->name('api.server-time');
 
-Route::post('/auth/google', [SocialAuthController::class, 'google'])->name('api.auth.google');
 Route::get('/auth/google/url', [SocialAuthController::class, 'googleUrl'])->name('api.auth.google.url');
+Route::post('/auth/google', [SocialAuthController::class, 'google'])->name('api.auth.google');
 // Apple sign-in is disabled for now.
 // Route::post('/auth/apple', [SocialAuthController::class, 'apple'])->name('api.auth.apple');
 

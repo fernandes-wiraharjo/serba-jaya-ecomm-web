@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 class ServerTimeController extends ApiController
 {
     /**
-     * Return the current server time in the application's configured timezone.
+     * Get current server time.
      */
     public function show(): JsonResponse
     {

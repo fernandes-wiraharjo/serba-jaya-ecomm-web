@@ -19,7 +19,7 @@ use Laravel\Socialite\Two\User as SocialiteUser;
 class SocialAuthController extends ApiController
 {
     /**
-     * Exchange a Google identity token for a Sanctum token.
+     * SDK Login: Exchange a Google identity token for a Sanctum API token.
      *
      * This endpoint is used when the frontend manages sign-in with the SDK. For web-based login, see [Google login URL](/docs/api#/operations/auth.google.url).
      */
@@ -39,7 +39,7 @@ class SocialAuthController extends ApiController
     }
 
     /**
-     * Return the Google authorization URL for the browser sign-in option.
+     * Web-based Login: Get the Google authorization URL.
      *
      * Open the URL in the browser. After Google redirects back, the callback opens the Android app with an intent link.
      */

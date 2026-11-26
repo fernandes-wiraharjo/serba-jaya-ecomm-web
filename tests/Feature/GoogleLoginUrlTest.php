@@ -52,6 +52,22 @@ class GoogleLoginUrlTest extends TestCase
         $this->assertSame(40, strlen($query['state']));
     }
 
+    public function test_google_login_url_keeps_the_web_client_when_an_sdk_client_id_is_configured(): void
+    {
+        config([
+            'services.google.client_ids' => ['sdk-client.apps.googleusercontent.com'],
+        ]);
+
+        $response = $this->signedApi('GET', '/api/auth/google/url');
+
+        $url = $response->json('data.url');
+        $query = [];
+        parse_str((string) parse_url((string) $url, PHP_URL_QUERY), $query);
+
+        $this->assertSame('google-client', $query['client_id']);
+        $this->assertStringNotContainsString('sdk-client.apps.googleusercontent.com', (string) $url);
+    }
+
     public function test_google_login_url_returns_401_without_an_api_signature(): void
     {
         $this->getJson('/api/auth/google/url')

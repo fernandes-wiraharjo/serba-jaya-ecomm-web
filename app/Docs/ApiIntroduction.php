@@ -143,7 +143,9 @@ class ApiIntroduction
 
         `device_name` is optional and defaults to `mobile`. It only labels the Sanctum token.
 
-        `GOOGLE_CLIENT_ID` must match the token audience. iOS, Android, and web each have their own client id. List any extra audiences in `GOOGLE_CLIENT_IDS`, separated by commas.
+        Web-based login uses `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. The secret is only used to exchange Google's authorization code.
+
+        SDK login does not use a client secret. Put each mobile client id in `GOOGLE_CLIENT_IDS`, separated by commas. The identity token audience must be one of those ids. `GOOGLE_CLIENT_ID` is also accepted.
 
         The account is stored by the provider subject id. A later sign-in with the same Google account returns a token for the same user, even when the provider omits the email.
 
