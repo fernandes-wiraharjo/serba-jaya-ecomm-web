@@ -27,8 +27,8 @@ class ApiIntroduction
 
         ## How to build the signature
 
-        1. Collect the request payload: JSON body, form body, and query parameters. Headers are not part of the payload.
-        2. Drop every field whose value is `null`.
+        1. Collect the request payload: JSON fields, form text fields, and query parameters. Headers are not part of the payload. Uploaded files are excluded.
+        2. Drop every field whose value is `null`. An empty string is kept. A field that was not sent is not part of the payload.
         3. Sort the remaining fields by key, A to Z, using binary order.
         4. Concatenate only the values, in that order, with no separator.
         5. Append the `X-Nonce` value, then the secret.
@@ -58,6 +58,12 @@ class ApiIntroduction
         - booleans are `true` or `false`
         - objects are JSON with nulls removed, keys sorted, and slashes left unescaped
         - lists are JSON arrays with null items removed
+
+        Sign each text value exactly as the client sends it. The signature is checked before the server normalizes anything. A phone number sent as `0812-3456-7890` is signed as `0812-3456-7890`, then stored as `6281234567890`.
+
+        ### Uploaded files
+
+        Leave every file out of the signature. On `POST /api/user/profile/update`, sign `name`, `phone`, `birth_date`, `gender`, and `referral_code` when that field is present. Do not include `profile_photo`.
 
         ### No payload
 
@@ -168,6 +174,25 @@ class ApiIntroduction
           "errors": null
         }
         ```
+
+        ## Update profile
+
+        Google sign-in stores the name and email. `POST /api/user/profile/update` saves the rest for the signed-in user, and the same request updates that profile later. Send the Sanctum bearer token and the API signature headers. Send the current name, phone, birth date, and gender each time. A missing birth date or gender is stored as null.
+
+        The profile photo is not part of the signature. Sign the text fields only, exactly as sent.
+
+        | Field | Required | Value |
+        | --- | --- | --- |
+        | `name` | yes | Display name. |
+        | `phone` | yes | Indonesian mobile number. Spaces and dashes are removed. `0812...`, `+62...`, and a number with no prefix are stored as `628...`. |
+        | `birth_date` | no | `Y-m-d`. |
+        | `gender` | no | `male` or `female`. |
+        | `profile_photo` | no | Image file, resized to 600 by 600 WebP. The response URL is built from the stored disk and path. |
+        | `referral_code` | no | Another member's code. It is rejected when that code does not exist. |
+
+        `POST /api/user/referral/code-check` accepts `{ "code": "K7MQ2P9" }` and returns `data.valid`. Use it to enable the submit button. The signed-in user's own code is not valid.
+
+        The profile response `referral_code` is this account's own code to share. `referral_code` in the request is the code they join with.
 
         An identity token that fails verification is rejected:
 

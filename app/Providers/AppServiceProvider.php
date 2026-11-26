@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Docs\ApiIntroduction;
+use App\Docs\RouteDocumentOrder;
 use App\Support\GoogleIdentityProvider;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
@@ -41,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
 
         Scramble::configure()->withDocumentTransformers(function (OpenApi $openApi): void {
             $openApi->info->setDescription(ApiIntroduction::markdown());
+            RouteDocumentOrder::apply($openApi);
         });
 
         Event::listen(function (SocialiteWasCalled $event): void {

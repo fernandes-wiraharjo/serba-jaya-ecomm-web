@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ReferralCodeController;
 use App\Http\Controllers\Api\ServerTimeController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Responses\ApiResponse;
@@ -13,6 +15,14 @@ Route::post('/auth/google', [SocialAuthController::class, 'google'])->name('api.
 // Apple sign-in is disabled for now.
 // Route::post('/auth/apple', [SocialAuthController::class, 'apple'])->name('api.auth.apple');
 
-Route::get('/user', function (Request $request) {
-    return ApiResponse::success($request->user());
-})->middleware('auth:sanctum')->name('api.user');
+Route::middleware('auth:sanctum')->group(function (): void {
+    Route::get('/user', function (Request $request) {
+        return ApiResponse::success($request->user());
+    })->name('api.user');
+
+    Route::post('/user/profile/update', [ProfileController::class, 'update'])
+        ->name('api.user.profile.update');
+
+    Route::post('/user/referral/code-check', [ReferralCodeController::class, 'check'])
+        ->name('api.user.referral.code-check');
+});
