@@ -32,8 +32,24 @@ class ApiDocumentationTest extends TestCase
         $response->assertSee('GOOGLE_MOBILE_INTENT_PACKAGE', false);
         $response->assertSee('The Google browser callback is not signed', false);
         $response->assertSee('SDK login does not use a client secret.', false);
-        $response->assertSee('Complete registration', false);
+        $response->assertSee('Update profile', false);
         $response->assertSee('The profile photo is not part of the signature.', false);
         $response->assertSee('returns `data.valid`', false);
+    }
+
+    public function test_docs_list_endpoints_in_route_order(): void
+    {
+        $this->app['env'] = 'local';
+
+        $response = $this->get(route('scramble.docs.ui'));
+
+        $response->assertOk();
+        $response->assertSeeInOrder([
+            '"tags":["ServerTime"]',
+            '"tags":["SocialAuth"]',
+            '"tags":["User"]',
+            '"tags":["Profile"]',
+            '"tags":["ReferralCode"]',
+        ], false);
     }
 }

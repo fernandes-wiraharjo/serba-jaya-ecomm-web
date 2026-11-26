@@ -63,7 +63,7 @@ class ApiIntroduction
 
         ### Uploaded files
 
-        Leave every file out of the signature. On `POST /api/auth/register`, sign `name`, `phone`, `birth_date`, `gender`, and `referral_code` when that field is present. Do not include `profile_photo`.
+        Leave every file out of the signature. On `POST /api/user/profile/update`, sign `name`, `phone`, `birth_date`, `gender`, and `referral_code` when that field is present. Do not include `profile_photo`.
 
         ### No payload
 
@@ -175,9 +175,9 @@ class ApiIntroduction
         }
         ```
 
-        ## Complete registration
+        ## Update profile
 
-        Google sign-in stores the name and email. `POST /api/auth/register` saves the rest for the signed-in user. Send the Sanctum bearer token and the API signature headers.
+        Google sign-in stores the name and email. `POST /api/user/profile/update` saves the rest for the signed-in user, and the same request updates that profile later. Send the Sanctum bearer token and the API signature headers. Send the current name, phone, birth date, and gender each time. A missing birth date or gender is stored as null.
 
         The profile photo is not part of the signature. Sign the text fields only, exactly as sent.
 
@@ -192,7 +192,7 @@ class ApiIntroduction
 
         `POST /api/user/referral/code-check` accepts `{ "code": "K7MQ2P9" }` and returns `data.valid`. Use it to enable the submit button. The signed-in user's own code is not valid.
 
-        The register response `referral_code` is this account's own code to share. `referral_code` in the request is the code they join with.
+        The profile response `referral_code` is this account's own code to share. `referral_code` in the request is the code they join with.
 
         An identity token that fails verification is rejected:
 

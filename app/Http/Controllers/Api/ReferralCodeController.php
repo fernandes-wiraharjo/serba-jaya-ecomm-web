@@ -9,9 +9,7 @@ use Illuminate\Http\JsonResponse;
 class ReferralCodeController extends ApiController
 {
     /**
-     * Report whether a referral code can be used by the signed-in user.
-     *
-     * The signed-in user's own code is not valid. A valid result can enable the registration submit button.
+     * Check if a referral code can be used by user.
      */
     public function check(CheckReferralCodeRequest $request): JsonResponse
     {

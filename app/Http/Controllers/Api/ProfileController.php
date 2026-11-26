@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\Gender;
-use App\Http\Requests\Api\RegisterRequest;
+use App\Http\Requests\Api\UpdateProfileRequest;
 use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\User;
@@ -12,16 +12,16 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
-class RegisterController extends ApiController
+class ProfileController extends ApiController
 {
     /**
-     * Save the account details Google sign-in does not provide.
+     * Update the signed-in user's profile.
      *
-     * Requires the Sanctum bearer token from sign-in and the API signature headers.
+     * Requires the Sanctum bearer token and the API signature headers.
      * profile_photo is not part of the signature. Optional referral_code is another member's code.
      * The response referral_code is this account's own code.
      */
-    public function store(RegisterRequest $request, ProfilePhoto $profilePhoto): JsonResponse
+    public function update(UpdateProfileRequest $request, ProfilePhoto $profilePhoto): JsonResponse
     {
         /** @var User $user */
         $user = $request->user();
@@ -60,7 +60,7 @@ class RegisterController extends ApiController
 
         return $this->success(
             data: $this->profile($user, $referralCode->code),
-            message: 'Registration completed.',
+            message: 'Profile updated.',
         );
     }
 

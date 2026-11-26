@@ -17,34 +17,34 @@ use Intervention\Image\ImageManager;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-class RegistrationTest extends TestCase
+class ProfileUpdateTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_register_returns_401_when_the_user_is_not_signed_in(): void
+    public function test_update_profile_returns_401_when_the_user_is_not_signed_in(): void
     {
-        $this->signedPost('/api/auth/register', [
+        $this->signedPost('/api/user/profile/update', [
             'name' => 'Buyer',
             'phone' => '081234567890',
         ])->assertUnauthorized()
             ->assertJsonPath('message', 'Unauthenticated.');
     }
 
-    public function test_register_returns_422_when_name_and_phone_are_missing(): void
+    public function test_update_profile_returns_422_when_name_and_phone_are_missing(): void
     {
         Sanctum::actingAs(User::factory()->create());
 
-        $this->signedPost('/api/auth/register', [])
+        $this->signedPost('/api/user/profile/update', [])
             ->assertUnprocessable()
             ->assertJsonPath('errors.name.0', 'The name is required.')
             ->assertJsonPath('errors.phone.0', 'The phone number is required.');
     }
 
-    public function test_register_returns_422_when_profile_fields_are_invalid(): void
+    public function test_update_profile_returns_422_when_profile_fields_are_invalid(): void
     {
         Sanctum::actingAs(User::factory()->create());
 
-        $this->signedPost('/api/auth/register', [
+        $this->signedPost('/api/user/profile/update', [
             'name' => 'Buyer',
             'phone' => '0212345678',
             'birth_date' => '17-08-1994',
@@ -55,7 +55,7 @@ class RegistrationTest extends TestCase
             ->assertJsonPath('errors.gender.0', 'The selected gender is invalid.');
     }
 
-    public function test_register_normalizes_the_phone_and_stores_the_profile(): void
+    public function test_update_profile_normalizes_the_phone_and_stores_the_profile(): void
     {
         $user = User::factory()->create([
             'name' => 'Google Name',
@@ -63,7 +63,7 @@ class RegistrationTest extends TestCase
         ]);
         Sanctum::actingAs($user);
 
-        $response = $this->signedPost('/api/auth/register', [
+        $response = $this->signedPost('/api/user/profile/update', [
             'name' => 'Buyer Name',
             'phone' => '0812-3456-7890',
             'birth_date' => '1994-08-17',
@@ -71,7 +71,7 @@ class RegistrationTest extends TestCase
         ]);
 
         $response->assertOk()
-            ->assertJsonPath('message', 'Registration completed.')
+            ->assertJsonPath('message', 'Profile updated.')
             ->assertJsonPath('data.email', 'buyer@example.com')
             ->assertJsonPath('data.name', 'Buyer Name')
             ->assertJsonPath('data.phone', '6281234567890')
@@ -91,24 +91,24 @@ class RegistrationTest extends TestCase
         ]);
     }
 
-    public function test_register_returns_422_when_the_phone_is_already_used(): void
+    public function test_update_profile_returns_422_when_the_phone_is_already_used(): void
     {
         User::factory()->create(['phone' => '6281234567890']);
         Sanctum::actingAs(User::factory()->create());
 
-        $this->signedPost('/api/auth/register', [
+        $this->signedPost('/api/user/profile/update', [
             'name' => 'Buyer',
             'phone' => '081234567890',
         ])->assertUnprocessable()
             ->assertJsonPath('errors.phone.0', 'The phone number has already been taken.');
     }
 
-    public function test_register_allows_the_same_user_to_keep_their_phone(): void
+    public function test_update_profile_allows_the_same_user_to_keep_their_phone(): void
     {
         $user = User::factory()->create(['phone' => '6281234567890']);
         Sanctum::actingAs($user);
 
-        $this->signedPost('/api/auth/register', [
+        $this->signedPost('/api/user/profile/update', [
             'name' => 'Updated',
             'phone' => '081234567890',
         ])->assertOk()
@@ -118,11 +118,11 @@ class RegistrationTest extends TestCase
         $this->assertDatabaseCount('referral_codes', 1);
     }
 
-    public function test_register_returns_422_when_the_referral_code_does_not_exist(): void
+    public function test_update_profile_returns_422_when_the_referral_code_does_not_exist(): void
     {
         Sanctum::actingAs(User::factory()->create());
 
-        $this->signedPost('/api/auth/register', [
+        $this->signedPost('/api/user/profile/update', [
             'name' => 'Buyer',
             'phone' => '081234567890',
             'referral_code' => 'MISSING1',
@@ -133,7 +133,7 @@ class RegistrationTest extends TestCase
         $this->assertDatabaseCount('referrals', 0);
     }
 
-    public function test_register_stores_a_referral_and_issues_the_users_own_code(): void
+    public function test_update_profile_stores_a_referral_and_issues_the_users_own_code(): void
     {
         $referrer = User::factory()->create();
         ReferralCode::factory()->create([
@@ -143,7 +143,7 @@ class RegistrationTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->signedPost('/api/auth/register', [
+        $response = $this->signedPost('/api/user/profile/update', [
             'name' => 'Buyer',
             'phone' => '+62 812 3456 7890',
             'referral_code' => 'k7mq-2p9x',
@@ -161,7 +161,7 @@ class RegistrationTest extends TestCase
         $this->assertSame(1, Referral::query()->count());
     }
 
-    public function test_register_returns_422_when_a_different_referral_was_already_applied(): void
+    public function test_update_profile_returns_422_when_a_different_referral_was_already_applied(): void
     {
         $user = User::factory()->create();
         $applied = ReferralCode::factory()->create(['code' => 'FIRSTCOD']);
@@ -173,7 +173,7 @@ class RegistrationTest extends TestCase
         ]);
         Sanctum::actingAs($user);
 
-        $this->signedPost('/api/auth/register', [
+        $this->signedPost('/api/user/profile/update', [
             'name' => 'Buyer',
             'phone' => '081234567890',
             'referral_code' => 'SECONDCD',
@@ -181,13 +181,13 @@ class RegistrationTest extends TestCase
             ->assertJsonPath('errors.referral_code.0', 'A referral code has already been applied.');
     }
 
-    public function test_register_returns_422_when_the_user_uses_their_own_referral_code(): void
+    public function test_update_profile_returns_422_when_the_user_uses_their_own_referral_code(): void
     {
         $user = User::factory()->create();
         $code = ReferralCode::issueFor($user);
         Sanctum::actingAs($user);
 
-        $this->signedPost('/api/auth/register', [
+        $this->signedPost('/api/user/profile/update', [
             'name' => 'Buyer',
             'phone' => '081234567890',
             'referral_code' => $code->code,
@@ -195,13 +195,13 @@ class RegistrationTest extends TestCase
             ->assertJsonPath('errors.referral_code.0', 'The referral code is invalid.');
     }
 
-    public function test_register_stores_a_profile_photo_as_a_600_pixel_webp_url(): void
+    public function test_update_profile_stores_a_profile_photo_as_a_600_pixel_webp_url(): void
     {
         Storage::fake('public');
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->signedPost('/api/auth/register', [
+        $response = $this->signedPost('/api/user/profile/update', [
             'name' => 'Buyer',
             'phone' => '081234567890',
         ], [
@@ -221,7 +221,7 @@ class RegistrationTest extends TestCase
         $this->assertSame('public', $user->fresh()->profile_photo_disk);
         $this->assertSame($files[0], $user->fresh()->profile_photo_path);
 
-        $second = $this->signedPost('/api/auth/register', [
+        $second = $this->signedPost('/api/user/profile/update', [
             'name' => 'Buyer',
             'phone' => '081234567890',
         ], [
@@ -235,7 +235,7 @@ class RegistrationTest extends TestCase
         $this->assertSame(Storage::disk('public')->url($remaining[0]), $second->json('data.profile_photo_url'));
     }
 
-    public function test_register_deletes_the_previous_photo_from_its_stored_disk(): void
+    public function test_update_profile_deletes_the_previous_photo_from_its_stored_disk(): void
     {
         Storage::fake('public');
         Storage::fake('local');
@@ -246,7 +246,7 @@ class RegistrationTest extends TestCase
         Storage::disk('local')->put('profile-photos/old.webp', 'old');
         Sanctum::actingAs($user);
 
-        $response = $this->signedPost('/api/auth/register', [
+        $response = $this->signedPost('/api/user/profile/update', [
             'name' => 'Buyer',
             'phone' => '081234567890',
         ], [
